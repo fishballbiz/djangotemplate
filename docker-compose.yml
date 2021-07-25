@@ -1,0 +1,63 @@
+version: "3.9"
+services:
+  dev:
+    build: .
+    hostname: dev
+    command: bash
+    volumes:
+      - ${PWD}:/app
+    ports:
+      - "8000:8000"
+
+  # this is used to monitor the data volume
+  data:
+    image: python:3-buster  # reuse existing image
+    command: bash
+    volumes:
+      - srv_data:/srv/app
+      - log_data:/var/log/app
+      - run_data:/var/run/app
+
+  prod:
+    build: .
+    hostname: prod
+    command: ['bash', '/app/uwsgi/start_prod_uwsgi.sh']
+    env_file:
+      - ./secrets/db_secrets.env
+    ports:
+      - "80:80"
+    depends_on:
+      - postgres
+      - nginx
+    volumes:
+      - srv_data:/srv/app
+      - log_data:/var/log/app
+      - run_data:/var/run/app
+
+  nginx:
+    build: ./nginx
+    restart: unless-stopped
+    volumes:
+      - srv_data:/srv/app
+      - log_data:/var/log/app
+      - run_data:/var/run/app
+    ports:
+      - "60080:80"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    env_file:
+      - ./secrets/db_secrets.env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+  srv_data:
+  log_data:
+  run_data:
+
+

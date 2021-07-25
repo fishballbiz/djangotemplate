@@ -1,0 +1,28 @@
+This project provides a template for launching a Django project with
+- Nginx
+- Let's Encrypt
+- uwsgi
+
+To use this project,
+1. clone the project
+2. delete .git to restart the git history
+3. `git init` to re-start the git history
+4. follow the instruction in secrets/README to setup production secrets
+
+= Production secrets
+For production, some secret files are required and they cannot
+be checked into the repo.
+
+= For Django
+name=secrets/django_secrets.py
+```
+SECRET_KEY = '<secrets here>'
+```
+
+= For Postgres
+name=secrets/db_secrets.env
+```
+POSTGRES_PASSWORD=<secret here>
+POSTGRES_USER=<username>
+POSTGRES_DB=<your app db>
+```
